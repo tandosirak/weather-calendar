@@ -4,93 +4,112 @@ import pytz
 from datetime import datetime, timedelta
 from icalendar import Calendar, Event
 
-# --- 설정 ---
-NX, NY = 60, 127
-REG_ID = '11B10101'
+# --- [1. 설정값] ---
+# 격자 및 구역 코드는 필요시 본인 지역에 맞게 수정하세요.
+NX, NY = 60, 127              # 단기예보 격자 (서울)
+REG_ID_TEMP = '11B10101'      # 중기기온 구역 (서울)
+REG_ID_LAND = '11B00000'      # 중기육상 구역 (서울, 인천, 경기도)
 API_KEY = os.environ.get('KMA_API_KEY')
 
-def get_weather_emoji(wf_or_sky, pty='0'):
-    """단기/중기 통합 이모지 변환"""
-    # 중기예보 텍스트 기반
-    if any(x in wf_or_sky for x in ['비', '소나기']): return "🌧️"
-    if '눈' in wf_or_sky: return "🌨️"
-    if '구름많음' in wf_or_sky: return "⛅"
-    if '흐림' in wf_or_sky: return "☁️"
-    if '맑음' in wf_or_sky: return "☀️"
-    # 단기예보 코드 기반 (숫자 들어올 경우)
+def get_emoji(wf_or_sky, pty='0'):
+    """상태값이나 코드를 이모지로 변환"""
+    wf = str(wf_or_sky)
+    if '비' in wf or '소나기' in wf: return "🌧️"
+    if '눈' in wf: return "🌨️"
+    if '구름많음' in wf: return "⛅"
+    if '흐림' in wf: return "☁️"
+    if '맑음' in wf or wf == '1': return "☀️"
     if pty != '0': return "🌧️"
-    if wf_or_sky == '1': return "☀️"
-    if wf_or_sky == '3': return "⛅"
-    if wf_or_sky == '4': return "☁️"
+    if wf == '3': return "⛅"
+    if wf == '4': return "☁️"
     return "🌡️"
 
-def fetch_kma(url):
+def fetch_api(url):
     try:
         res = requests.get(url)
-        if res.status_code == 200:
-            if "인증실패" in res.text or "SERVICE_KEY_IS_NOT_REGISTERED_ERROR" in res.text:
-                print(f"❌ API 인증 실패: {url.split('authKey=')[0]}")
-                return None
-            return res.text
-    except Exception as e:
-        print(f"❌ 네트워크 에러: {e}")
-    return None
+        return res.json() if res.status_code == 200 else None
+    except: return None
 
 def main():
     seoul_tz = pytz.timezone('Asia/Seoul')
     now = datetime.now(seoul_tz)
     cal = Calendar()
     cal.add('X-WR-CALNAME', '기상청 날씨 달력')
-
-    # 1. 단기 예보 (0~3일)
-    base_date = now.strftime('%Y%m%d')
-    short_url = f"https://apihub.kma.go.kr/api/typ01/url/vsc_sfc_af_dtl.php?base_date={base_date}&nx={NX}&ny={NY}&authKey={API_KEY}"
-    raw_short = fetch_kma(short_url)
     
-    forecast_map = {} # { '20231027': { 'temps': [], 'desc': [] } }
+    # --- [2. 단기예보 수집 (0~3일)] ---
+    base_date = now.strftime('%Y%m%d')
+    # 발표 시간 결정 (02, 05, 08, 11, 14, 17, 20, 23시)
+    base_time = f"{max([h for h in [2, 5, 8, 11, 14, 17, 20, 23] if h <= now.hour], default=2):02d}00"
+    url_short = f"https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst?pageNo=1&numOfRows=1000&dataType=JSON&base_date={base_date}&base_time={base_time}&nx={NX}&ny={NY}&authKey={API_KEY}"
+    
+    forecast_map = {}
+    short_res = fetch_api(url_short)
+    if short_res and 'response' in short_res and 'body' in short_res['response']:
+        items = short_res['response']['body']['items']['item']
+        for it in items:
+            d, t, cat, val = it['fcstDate'], it['fcstTime'], it['category'], it['fcstValue']
+            if d not in forecast_map: forecast_map[d] = {}
+            if t not in forecast_map[d]: forecast_map[d][t] = {}
+            forecast_map[d][t][cat] = val
 
-    if raw_short:
-        lines = [l for l in raw_short.split('\n') if not l.startswith('#') and len(l.split()) > 10]
-        for line in lines:
-            cols = line.split()
-            date, hour = cols[0], cols[1]
-            temp, sky, pty, pop, reh, wsd = cols[12], cols[13], cols[14], cols[15], cols[16], cols[17]
-            
-            if date not in forecast_map:
-                forecast_map[date] = {'temps': [], 'details': []}
-            
-            forecast_map[date]['temps'].append(float(temp))
-            emoji = get_weather_emoji(sky, pty)
-            forecast_map[date]['details'].append(f"[{hour[:2]}:00] {emoji} {temp}°C, ☔{pop}%, 💧{reh}%, 💨{wsd}m/s")
+    # --- [3. 중기예보 수집 (4~10일)] ---
+    tm_fc = now.strftime('%Y%m%d') + ("0600" if now.hour < 18 else "1800")
+    url_mid_temp = f"https://apihub.kma.go.kr/api/typ02/openApi/MidFcstInfoService/getMidTa?dataType=JSON&regId={REG_ID_TEMP}&tmFc={tm_fc}&authKey={API_KEY}"
+    url_mid_land = f"https://apihub.kma.go.kr/api/typ02/openApi/MidFcstInfoService/getMidLandFcst?dataType=JSON&regId={REG_ID_LAND}&tmFc={tm_fc}&authKey={API_KEY}"
+    
+    mid_temp_res = fetch_api(url_mid_temp)
+    mid_land_res = fetch_api(url_mid_land)
+    
+    mid_map = {}
+    if mid_temp_res and mid_land_res:
+        try:
+            t_item = mid_temp_res['response']['body']['items']['item'][0]
+            l_item = mid_land_res['response']['body']['items']['item'][0]
+            for i in range(4, 11):
+                d_str = (now + timedelta(days=i)).strftime('%Y%m%d')
+                suffix = "Am" if i <= 7 else ""
+                mid_map[d_str] = {
+                    'min': t_item.get(f'taMin{i}'),
+                    'max': t_item.get(f'taMax{i}'),
+                    'wf': l_item.get(f'wf{i}{suffix}'),
+                    'rn': l_item.get(f'rnSt{i}{suffix}')
+                }
+        except: pass
 
-    # 2. 캘린더 이벤트 생성 (오늘부터 10일치)
+    # --- [4. 캘린더 생성] ---
     for i in range(11):
         target_dt = now + timedelta(days=i)
-        date_str = target_dt.strftime('%Y%m%d')
+        d_str = target_dt.strftime('%Y%m%d')
         event = Event()
         
-        if date_str in forecast_map:
-            # 단기 데이터가 있는 경우
-            data = forecast_map[date_str]
-            t_min, t_max = min(data['temps']), max(data['temps'])
-            # 낮 12시 혹은 중간 시간대 날씨를 대표로 설정
-            rep_idx = len(data['details']) // 2
-            rep_emoji = data['details'][rep_idx].split()[1]
+        if d_str in forecast_map: # 단기 (0~3일)
+            d = forecast_map[d_str]
+            times = sorted(d.keys())
+            tmps = [float(d[t]['TMP']) for t in times if 'TMP' in d[t]]
+            t_min, t_max = (min(tmps), max(tmps)) if tmps else (0, 0)
+            rep_t = "1200" if "1200" in d else times[len(times)//2]
+            rep_em = get_emoji(d[rep_t].get('SKY'), d[rep_t].get('PTY'))
+            event.add('summary', f"{rep_em} {int(t_min)}° / {int(t_max)}°")
             
-            event.add('summary', f"{rep_emoji} {t_min}° / {t_max}°")
-            event.add('description', "\n".join(data['details']))
-        else:
-            # 데이터가 없는 날(중기 구간 등)은 기본값만 생성
-            event.add('summary', "날씨 정보 업데이트 대기 중")
-            event.add('description', "기상청 중기예보 데이터를 불러오는 중입니다.")
-
+            desc = []
+            for t in times:
+                it = d[t]
+                em = get_emoji(it.get('SKY'), it.get('PTY'))
+                desc.append(f"[{t[:2]}시] {em} {it.get('TMP')}°C, ☔{it.get('POP')}%, 💧{it.get('REH')}%, 💨{it.get('WSD')}m/s")
+            event.add('description', "\n".join(desc))
+            
+        elif d_str in mid_map: # 중기 (4~10일)
+            m = mid_map[d_str]
+            event.add('summary', f"{get_emoji(m['wf'])} {m['min']}° / {m['max']}°")
+            event.add('description', f"날씨: {m['wf']}\n강수확률: {m['rn']}%")
+        
         event.add('dtstart', target_dt.date())
-        event.add('dtend', target_dt.date() + timedelta(days=1))
+        event.add('dtend', (target_dt + timedelta(days=1)).date())
         cal.add_component(event)
 
     with open('weather.ics', 'wb') as f:
         f.write(cal.to_ical())
-    print(f"✅ 생성 완료: {datetime.now()}")
+    print("✅ 10일치 날씨 달력 생성이 완료되었습니다.")
 
 if __name__ == "__main__":
     main()
