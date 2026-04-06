@@ -23,7 +23,7 @@ DESCRIPTION:[04시] ☀️ 맑음 3°C (💧0% 습도60% 풍속0.5m/s)\n[0
  3m/s)\n[21시] ☀️ 맑음 8°C (💧0% 습도55% 풍속1.2m/s)\n[22시]
   ☀️ 맑음 7°C (💧0% 습도55% 풍속0.6m/s)\n[23시] ☀️ 맑음
   6°C (💧0% 습도60% 풍속0.6m/s)\n\n최종 업데이트: 2026-04-07 0
- 3:04:46 (KST)
+ 3:29:36 (KST)
 LOCATION:신내2동
 END:VEVENT
 BEGIN:VEVENT
@@ -51,7 +51,7 @@ DESCRIPTION:[00시] ☀️ 맑음 5°C (💧0% 습도65% 풍속0.7m/s)\n[0
  (💧0% 습도50% 풍속0.5m/s)\n[21시] ☀️ 맑음 10°C (💧0% 습
  도55% 풍속0.3m/s)\n[22시] ☁️ 흐림 9°C (💧30% 습도60% 풍속
  0.5m/s)\n[23시] ☁️ 흐림 8°C (💧30% 습도60% 풍속0.2m/s)\n\n
- 최종 업데이트: 2026-04-07 03:04:46 (KST)
+ 최종 업데이트: 2026-04-07 03:29:36 (KST)
 LOCATION:신내2동
 END:VEVENT
 BEGIN:VEVENT
@@ -79,7 +79,7 @@ DESCRIPTION:[00시] ☁️ 흐림 7°C (💧30% 습도65% 풍속0.2m/s)\n[
  60% 습도85% 풍속1.9m/s)\n[21시] 🌧️ 비 12°C (☔60% 습도85% 
  풍속2.9m/s)\n[22시] 🌧️ 비 11°C (☔60% 습도85% 풍속1.9m/s)\n
  [23시] 🌧️ 비 11°C (☔60% 습도85% 풍속1.4m/s)\n\n최종 업데
- 이트: 2026-04-07 03:04:46 (KST)
+ 이트: 2026-04-07 03:29:36 (KST)
 LOCATION:신내2동
 END:VEVENT
 BEGIN:VEVENT
@@ -106,7 +106,7 @@ DESCRIPTION:[00시] 🌧️ 비 11°C (☔60% 습도85% 풍속1.7m/s)\n[01
  [20시] ☀️ 맑음 16°C (💧0% 습도45% 풍속1m/s)\n[21시] ☀️ 
  맑음 13°C (💧0% 습도55% 풍속1m/s)\n[22시] ☀️ 맑음 13°C (
  💧0% 습도55% 풍속1m/s)\n[23시] ☀️ 맑음 13°C (💧0% 습도55
- % 풍속1m/s)\n\n최종 업데이트: 2026-04-07 03:04:46 (KST)
+ % 풍속1m/s)\n\n최종 업데이트: 2026-04-07 03:29:36 (KST)
 LOCATION:신내2동
 END:VEVENT
 BEGIN:VEVENT
@@ -115,7 +115,7 @@ DTSTART;VALUE=DATE:20260412
 DTEND;VALUE=DATE:20260413
 UID:20260412@mid
 DESCRIPTION:[오전] ☀️ 맑음 (☔10%)\n[오후] ☀️ 맑음 (☔10
- %)\n\n최종 업데이트: 2026-04-07 03:04:46 (KST)
+ %)\n\n최종 업데이트: 2026-04-07 03:29:36 (KST)
 LOCATION:신내2동
 END:VEVENT
 BEGIN:VEVENT
@@ -124,7 +124,7 @@ DTSTART;VALUE=DATE:20260413
 DTEND;VALUE=DATE:20260414
 UID:20260413@mid
 DESCRIPTION:[오전] ☀️ 맑음 (☔10%)\n[오후] ⛅ 구름많음 (
- ☔20%)\n\n최종 업데이트: 2026-04-07 03:04:46 (KST)
+ ☔20%)\n\n최종 업데이트: 2026-04-07 03:29:36 (KST)
 LOCATION:신내2동
 END:VEVENT
 BEGIN:VEVENT
@@ -133,7 +133,7 @@ DTSTART;VALUE=DATE:20260414
 DTEND;VALUE=DATE:20260415
 UID:20260414@mid
 DESCRIPTION:[오전] ☀️ 맑음 (☔10%)\n[오후] ☀️ 맑음 (☔10
- %)\n\n최종 업데이트: 2026-04-07 03:04:46 (KST)
+ %)\n\n최종 업데이트: 2026-04-07 03:29:36 (KST)
 LOCATION:신내2동
 END:VEVENT
 BEGIN:VEVENT
@@ -142,7 +142,7 @@ DTSTART;VALUE=DATE:20260415
 DTEND;VALUE=DATE:20260416
 UID:20260415@mid
 DESCRIPTION:[종일] ⛅ 구름많음 (☔20%)\n\n최종 업데이트: 202
- 6-04-07 03:04:46 (KST)
+ 6-04-07 03:29:36 (KST)
 LOCATION:신내2동
 END:VEVENT
 BEGIN:VEVENT
@@ -151,7 +151,7 @@ DTSTART;VALUE=DATE:20260416
 DTEND;VALUE=DATE:20260417
 UID:20260416@mid
 DESCRIPTION:[종일] ⛅ 구름많음 (☔30%)\n\n최종 업데이트: 202
- 6-04-07 03:04:46 (KST)
+ 6-04-07 03:29:36 (KST)
 LOCATION:신내2동
 END:VEVENT
 BEGIN:VEVENT
@@ -160,7 +160,7 @@ DTSTART;VALUE=DATE:20260417
 DTEND;VALUE=DATE:20260418
 UID:20260417@mid
 DESCRIPTION:[종일] ☀️ 맑음 (☔10%)\n\n최종 업데이트: 2026-0
- 4-07 03:04:46 (KST)
+ 4-07 03:29:36 (KST)
 LOCATION:신내2동
 END:VEVENT
 END:VCALENDAR
