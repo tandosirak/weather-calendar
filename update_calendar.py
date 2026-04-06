@@ -112,7 +112,6 @@ def main():
             
             if event_time >= now:
                 emoji, wf_str = get_weather_info(cache['SKY'], cache['PTY'])
-                # 강수확률(POP)은 비가 안 와도 표시, 비가 오면 아이콘 변경
                 rain_icon = "☔" if cache['PTY'] != '0' else "💧"
                 desc.append(f"[{t_str[:2]}시] {emoji} {wf_str} {cache['TMP']}°C ({rain_icon}{cache['POP']}% 습도{cache['REH']}% 풍속{cache['WSD']}m/s)")
                 has_future_data = True
@@ -132,8 +131,7 @@ def main():
         cal.add_component(event)
         processed_dates.add(d_str)
 
-    # --- [3. 중기 예보 (14:00 업데이트 이슈 해결 로직)] ---
-    # 오후 6시 30분 전까지는 안전하게 오전 6시 데이터를 참조
+    # --- [3. 중기 예보 (경계면 누락 방지를 위한 수정)] ---
     if now.hour < 6:
         tm_fc = (now - timedelta(days=1)).strftime('%Y%m%d') + "1800"
     elif now.hour < 18:
@@ -146,7 +144,6 @@ def main():
     
     t_res, l_res = fetch_api(url_mid_temp), fetch_api(url_mid_land)
     
-    # 만약 18:00 데이터가 아직 생성 전이라 실패하면 06:00 데이터로 백업 호출
     if not (t_res and l_res) and tm_fc.endswith("1800"):
         tm_fc = now.strftime('%Y%m%d') + "0600"
         url_mid_temp = f"https://apihub.kma.go.kr/api/typ02/openApi/MidFcstInfoService/getMidTa?dataType=JSON&regId={REG_ID_TEMP}&tmFc={tm_fc}&authKey={API_KEY}"
@@ -157,9 +154,12 @@ def main():
         try:
             t_items = t_res['response']['body']['items']['item'][0]
             l_items = l_res['response']['body']['items']['item'][0]
-            for i in range(3, 11):
+            # range 범위를 2부터 시작하여 단기 예보가 끝나는 지점의 누락을 방지합니다.
+            for i in range(2, 11):
                 d_target_dt = now + timedelta(days=i)
                 d_target_str = d_target_dt.strftime('%Y%m%d')
+                
+                # 단기 예보에서 이미 처리된 날짜는 건너뜁니다.
                 if d_target_str in processed_dates: continue
                 
                 t_min, t_max = t_items.get(f'taMin{i}'), t_items.get(f'taMax{i}')
