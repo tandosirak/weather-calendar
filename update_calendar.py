@@ -97,8 +97,17 @@ def main():
                     if cat in day_data[t_str]: cache[cat] = day_data[t_str][cat]
             if event_time >= now:
                 emoji, wf_str = get_weather_info(cache['SKY'], cache['PTY'])
-                rain_icon = "☔" if cache['PTY'] != '0' else "💧"
-                desc.append(f"[{t_str[:2]}시] {emoji} {wf_str} {cache['TMP']}°C ({rain_icon}{cache['POP']}% 습도{cache['REH']}% 풍속{cache['WSD']}m/s)")
+                rain_info = ""
+                if cache['PTY'] != '0':  # 비/눈 등이 오는 경우
+                    rain_info = f" ☔{cache['POP']}%"
+                
+                # 2. 습도 및 풍속 아이콘 적용
+                humidity_val = f"💧{cache['REH']}%"
+                wind_val = f"🚩{cache['WSD']}m/s"
+                
+                # 3. 최종 한 줄 생성
+                line = f"[{t_str[:2]}시] {emoji} {wf_str} {cache['TMP']}°C ({rain_info} {humidity_val} {wind_val})"
+                desc.append(line)
                 has_future_data = True
         if not has_future_data: continue
         event = Event()
