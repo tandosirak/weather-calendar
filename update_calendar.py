@@ -197,6 +197,7 @@ def main():
         try:
             t_items = t_res['response']['body']['items']['item'][0]
             l_items = l_res['response']['body']['items']['item'][0]
+            print(f"[DEBUG] tm_fc_dt={tm_fc_dt}, t_items keys={list(t_items.keys())}")
         except (KeyError, IndexError, TypeError):
             t_items, l_items = None, None
 
