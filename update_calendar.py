@@ -77,6 +77,61 @@ def get_tmfc_candidates(now):
     candidates.append(c2)
     return candidates
 
+def make_short_ampm_event(d_str, day_data, update_ts, seoul_tz, location):
+    """단기예보 데이터로 오전/오후 요약 이벤트 생성 (4일차 폴백용)"""
+    # 오전: 06~11시, 오후: 12~17시
+    am_hours = [f"{h:02d}00" for h in range(6, 12)]
+    pm_hours = [f"{h:02d}00" for h in range(12, 18)]
+
+    def rep_slot(hours):
+        tmps, pops, skies, ptys = [], [], [], []
+        for t in hours:
+            if t in day_data:
+                td = day_data[t]
+                if 'TMP' in td: tmps.append(float(td['TMP']))
+                if 'POP' in td: pops.append(int(td['POP']))
+                if 'SKY' in td: skies.append(td['SKY'])
+                if 'PTY' in td: ptys.append(td['PTY'])
+        if not tmps:
+            return None
+        # 대표 날씨: PTY 우선, 없으면 SKY 최빈값
+        pty_rep = max(set(ptys), key=ptys.count) if ptys else '0'
+        sky_rep = max(set(skies), key=skies.count) if skies else '1'
+        emoji, wf_str = get_weather_info(sky_rep, pty_rep)
+        pop_max = max(pops) if pops else 0
+        return emoji, wf_str, pop_max
+
+    am = rep_slot(am_hours)
+    pm = rep_slot(pm_hours)
+    if not am and not pm:
+        return None
+
+    # 최저/최고 기온 (전체 시간대)
+    all_tmps = [float(day_data[t]['TMP']) for t in day_data if 'TMP' in day_data[t]]
+    if not all_tmps:
+        return None
+    t_min, t_max = int(min(all_tmps)), int(max(all_tmps))
+
+    # 대표 이모지 (오후 우선)
+    rep_emoji = (pm or am)[0]
+
+    mid_desc = []
+    if am:
+        mid_desc.append(f"[오전] {am[0]} {am[1]} (☔{am[2]}%)")
+    if pm:
+        mid_desc.append(f"[오후] {pm[0]} {pm[1]} (☔{pm[2]}%)")
+    mid_desc.append(f"\n최종 업데이트: {update_ts} (KST)")
+
+    event = Event()
+    event.add('summary', f"{rep_emoji} {t_min}°C/{t_max}°C")
+    event.add('location', location)
+    event.add('description', "\n".join(mid_desc))
+    event_date = datetime.strptime(d_str, '%Y%m%d').date()
+    event.add('dtstart', event_date)
+    event.add('dtend', event_date + timedelta(days=1))
+    event.add('uid', f"{d_str}@short_ampm")
+    return event
+
 def main():
     seoul_tz = pytz.timezone('Asia/Seoul')
     now = datetime.now(seoul_tz)
@@ -108,8 +163,10 @@ def main():
             forecast_map[d][t][cat] = val
 
     cache = {'TMP': '15', 'SKY': '1', 'PTY': '0', 'REH': '50', 'WSD': '1.0', 'POP': '0'}
-    short_term_limit = (now + timedelta(days=4)).strftime('%Y%m%d')  # 3 → 4
+    short_term_limit = (now + timedelta(days=3)).strftime('%Y%m%d')
+    day4_str = (now + timedelta(days=4)).strftime('%Y%m%d')
 
+    # 1~3일차: 시간별 상세
     for d_str in sorted(forecast_map.keys()):
         if d_str > short_term_limit: continue
         day_data = forecast_map[d_str]
@@ -128,14 +185,12 @@ def main():
                     if cat in day_data[t_str]: cache[cat] = day_data[t_str][cat]
             if event_time >= now:
                 emoji, wf_str = get_weather_info(cache['SKY'], cache['PTY'])
-
                 details = []
                 if cache['PTY'] != '0':
                     details.append(f"☔{cache['POP']}%")
                 details.append(f"💧{cache['REH']}%")
                 details.append(f"🚩{cache['WSD']}m/s")
                 details_str = " ".join(details)
-
                 line = f"[{t_str[:2]}시] {emoji} {wf_str} {cache['TMP']}°C ({details_str})"
                 desc.append(line)
                 has_future_data = True
@@ -220,6 +275,13 @@ def main():
                 event.add('uid', f"{d_target_str}@mid")
                 cal.add_component(event)
                 processed_dates.add(d_target_str)
+
+    # --- [4. 4일차 폴백: 중기에 없으면 단기 데이터로 오전/오후 요약] ---
+    if day4_str not in processed_dates and day4_str in forecast_map:
+        event = make_short_ampm_event(day4_str, forecast_map[day4_str], update_ts, seoul_tz, LOCATION_NAME)
+        if event:
+            cal.add_component(event)
+            processed_dates.add(day4_str)
 
     with open('weather.ics', 'wb') as f:
         f.write(cal.to_ical())
