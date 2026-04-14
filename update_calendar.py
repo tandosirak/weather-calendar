@@ -233,7 +233,7 @@ def main():
                     rn_st = l_items.get(f'rnSt{i}')
                     mid_desc.append(f"[종일] {get_mid_emoji(wf_rep_val)} {wf_rep_val} (☔{rn_st}%)")
 
-                event.add('summary', f"{get_mid_emoji(wf_rep)} {wf_rep} {t_min}/{t_max}°C")
+                event.add('summary', f"{get_mid_emoji(wf_rep)} {t_min}/{t_max}°C")
                 event.add('location', LOCATION_NAME)
                 mid_desc.append(f"\n최종 업데이트: {update_ts} (KST)")
                 event.add('description', "\n".join(mid_desc))
