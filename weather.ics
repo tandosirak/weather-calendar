@@ -3,26 +3,6 @@ X-WR-CALNAME:기상청 날씨
 X-WR-TIMEZONE:Asia/Seoul
 BEGIN:VEVENT
 SUMMARY:☀️ 18°C/26°C
-DTSTART;VALUE=DATE:20260627
-DTEND;VALUE=DATE:20260628
-UID:20260627@short_summary
-DESCRIPTION:[07시] ⛅ 구름많음 19°C (💧80% 🚩3m/s)\n[08시] ☀
- ️ 맑음 21°C (💧70% 🚩3.2m/s)\n[09시] ☁️ 흐림 22°C (💧65
- % 🚩3.5m/s)\n[10시] ⛅ 구름많음 23°C (💧65% 🚩3.9m/s)\n[11시
- ] ⛅ 구름많음 23°C (💧60% 🚩4m/s)\n[12시] ☀️ 맑음 23°C (
- 💧65% 🚩4.3m/s)\n[13시] ☀️ 맑음 24°C (💧60% 🚩4.1m/s)\n[14
- 시] ⛅ 구름많음 25°C (💧60% 🚩4.3m/s)\n[15시] ☀️ 맑음 26
- °C (💧55% 🚩4.3m/s)\n[16시] ☀️ 맑음 25°C (💧55% 🚩4.1m/s)
- \n[17시] ☀️ 맑음 24°C (💧55% 🚩4.1m/s)\n[18시] ☀️ 맑음 
- 23°C (💧60% 🚩3.5m/s)\n[19시] ☀️ 맑음 22°C (💧65% 🚩2.9m/
- s)\n[20시] ☀️ 맑음 21°C (💧75% 🚩2.2m/s)\n[21시] ☀️ 맑
- 음 20°C (💧80% 🚩2m/s)\n[22시] ☀️ 맑음 20°C (💧80% 🚩1.5
- m/s)\n[23시] ☀️ 맑음 19°C (💧85% 🚩1.2m/s)\n\n최종 업데이
- 트: 2026-06-27 06:38:55 (KST)
-LOCATION:보림초
-END:VEVENT
-BEGIN:VEVENT
-SUMMARY:☀️ 18°C/26°C
 DTSTART;VALUE=DATE:20260628
 DTEND;VALUE=DATE:20260629
 UID:20260628@short_summary
