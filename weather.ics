@@ -2,20 +2,6 @@ BEGIN:VCALENDAR
 X-WR-CALNAME:기상청 날씨
 X-WR-TIMEZONE:Asia/Seoul
 BEGIN:VEVENT
-SUMMARY:🌧️ 20°C/23°C
-DTSTART;VALUE=DATE:20260701
-DTEND;VALUE=DATE:20260702
-UID:20260701@short_summary
-DESCRIPTION:[16시] 🌧️ 비 23°C (☔60% 💧80% 🚩2m/s)\n[17시] 
- 🌧️ 비 22°C (☔60% 💧80% 🚩2.3m/s)\n[18시] ☁️ 흐림 21°C
-  (💧85% 🚩2.4m/s)\n[19시] 🌧️ 비 20°C (☔60% 💧90% 🚩2.1m/
- s)\n[20시] 🌧️ 비 20°C (☔60% 💧90% 🚩1.6m/s)\n[21시] 🌧️
-  비 20°C (☔60% 💧90% 🚩1.5m/s)\n[22시] ☁️ 흐림 20°C (💧9
- 5% 🚩1.3m/s)\n[23시] ☁️ 흐림 20°C (💧95% 🚩0.8m/s)\n\n최종
-  업데이트: 2026-07-01 15:43:27 (KST)
-LOCATION:보림초
-END:VEVENT
-BEGIN:VEVENT
 SUMMARY:☁️ 20°C/26°C
 DTSTART;VALUE=DATE:20260702
 DTEND;VALUE=DATE:20260703
